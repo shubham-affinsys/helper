@@ -94,6 +94,10 @@ custom :
 feild__custom_para = "val"
 ex Student.objects.filter(department__department=="CIVIL")
 
+can also merge multiple in one statement
+Student.objects.filter(department__department__icontains=="C")  # will inculde CICIl and CSE department
+
+
 BASIC
 __gt : greater than
 __gte : greater than equal to
