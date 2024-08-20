@@ -9,6 +9,18 @@ class Car(models.Model):
     def __str__(self) -> str:
         return self.car_name +" "+str(self.speed)
 
+store data in an order -->
+class Department(models.Model):
+    department = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.department
+
+    class Meta:
+        ordering = ['department'] # data will be stored in a specific order department name in this case
+
+
+
 
 CREATE
 
