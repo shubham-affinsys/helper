@@ -1,0 +1,198 @@
+url = https://realpython.com/python-redis/
+
+install:
+$ redisurl="http://download.redis.io/redis-stable.tar.gz"
+$ curl -s -o redis-stable.tar.gz $redisurl
+$ sudo su root
+$ mkdir -p /usr/local/lib/
+$ chmod a+w /usr/local/lib/
+$ tar -C /usr/local/lib/ -xzf redis-stable.tar.gz
+$ rm redis-stable.tar.gz
+$ cd /usr/local/lib/redis-stable/
+$ make && make install
+
+check installation : $ redis-cli --version
+
+
+$ ls -hFG /usr/local/bin/redis-* | sort
+/usr/local/bin/redis-benchmark*
+/usr/local/bin/redis-check-aof*
+/usr/local/bin/redis-check-rdb*
+/usr/local/bin/redis-cli*
+/usr/local/bin/redis-sentinel@
+/usr/local/bin/redis-server*
+
+config redis:
+$ sudo su root
+$ mkdir -p /etc/redis/
+$ touch /etc/redis/6379.conf
+
+open /etc/redis/6379.conf and add ->
+# /etc/redis/6379.conf
+
+port              6379
+daemonize         yes
+save              60 1
+bind              127.0.0.1
+tcp-keepalive     300
+dbfilename        dump.rdb
+dir               ./
+rdbcompression    yes
+
+
+->
+enter redis:
+$ redis-server /etc/redis/6379.conf
+127.0.0.1:6379>
+
+test : 127.0.0.1:6379> PING
+PONG
+
+
+to shutdown server use :
+$ pgrep redis-server  # get pdid grom here and kill or
+$ pkill redis-server
+
+#####################
+start-server using: $ reids-server
+use redis :  $ redis-cli
+it also creates a db at 0
+create new db : redis-cli -n 5
+
+
+
+##########
+commands:
+SET- takes a key value pair and return OK
+GET- takes a key and return value otherwise nil
+MSET- takes multiple key value pair
+MGET- takes multiple keys and returns their values if exists otherwise nil
+EXISTS- returns 1 if the key exists otherwise 0
+EXPIRE- expires after some time ex. EXPIRES key_name time_in_sec
+FLUSHDB- remove all key-value pairs
+QUIT - exit redis cli
+KEYS * - get all keys
+####
+datatypes in redis:
+Type 	Commands
+Sets 	SADD, SCARD, SDIFF, SDIFFSTORE, SINTER, SINTERSTORE, SISMEMBER, SMEMBERS, SMOVE, SPOP, SRANDMEMBER, SREM, SSCAN, SUNION, SUNIONSTORE
+Hashes 	HDEL, HEXISTS, HGET, HGETALL, HINCRBY, HINCRBYFLOAT, HKEYS, HLEN, HMGET, HMSET, HSCAN, HSET, HSETNX, HSTRLEN, HVALS
+Lists 	BLPOP, BRPOP, BRPOPLPUSH, LINDEX, LINSERT, LLEN, LPOP, LPUSH, LPUSHX, LRANGE, LREM, LSET, LTRIM, RPOP, RPOPLPUSH, RPUSH, RPUSHX
+Strings 	APPEND, BITCOUNT, BITFIELD, BITOP, BITPOS, DECR, DECRBY, GET, GETBIT, GETRANGE, GETSET, INCR, INCRBY, INCRBYFLOAT, MGET, MSET, MSETNX, PSETEX, SET, SETBIT, SETEX, SETNX, SETRANGE, STRLEN
+
+
+1. HSET - A hash is a mapping of string:string, called field-value pairs,
+         that sits under one top-level key:
+         e.x.
+##
+127.0.0.1:6379> HSET realpython url "https://realpython.com/"
+(integer) 1
+127.0.0.1:6379> HSET realpython github realpython
+(integer) 1
+127.0.0.1:6379> HSET realpython fullname "Real Python"
+(integer) 1
+##
+
+or in python
+##
+data = {
+    "realpython": {
+        "url": "https://realpython.com/",
+        "github": "realpython",
+        "fullname": "Real Python",
+    }
+}
+##
+
+
+HMSET and HGETALL
+
+127.0.0.1:6379> HMSET pypa url "https://www.pypa.io/" github pypa fullname "Python Packaging Authority"
+OK
+127.0.0.1:6379> HGETALL pypa
+1) "url"
+2) "https://www.pypa.io/"
+3) "github"
+4) "pypa"
+5) "fullname"
+6) "Python Packaging Authority"
+
+
+
+
+
+
+
+
+
+
+######
+Command exmaples:
+
+127.0.0.1:6379> SET Bahamas Nassau
+OK
+127.0.0.1:6379> SET Croatia Zagreb
+OK
+127.0.0.1:6379> GET Croatia
+"Zagreb"
+127.0.0.1:6379> GET Japan
+(nil)
+
+or in python like
+>>> capitals = {}
+>>> capitals["Bahamas"] = "Nassau"
+>>> capitals["Croatia"] = "Zagreb"
+>>> capitals.get("Croatia")
+'Zagreb'
+>>> capitals.get("Japan")  # None
+
+# MSET and MGET -> set and get multiple values
+127.0.0.1:6379> MSET Lebanon Beirut Norway Oslo France Paris
+OK
+127.0.0.1:6379> MGET Lebanon Norway Bahamas
+1) "Beirut"
+2) "Oslo"
+3) "Nassau"
+
+
+or in python
+>>> capitals.update({
+...     "Lebanon": "Beirut",
+...     "Norway": "Oslo",
+...     "France": "Paris",
+... })
+>>> [capitals.get(k) for k in ("Lebanon", "Norway", "Bahamas")]
+['Beirut', 'Oslo', 'Nassau']
+
+
+
+
+
+
+
+
+
+##################################
+REDIS PUB/SUB
+
+
+commands:
+SUBSCRIBE- used to subscribe the client to the specified channels
+PUBLISH- used to post a message to given channel
+UNSUBSCRIBE- it is used to unsubscribe to given channel
+PSUBSCRIBE- subscribe client to given pattern
+PUNSUBSCRIBE- unsubscribe client from given pattern
+PUBUB CHANNELS- list currently active channels
+PUBSUB NUMSUB- returns no of subscribers (exclusive of clients subscribed to patterns) for specified channels
+
+PING
+RESET
+QUIT
+
+
+
+
+
+
+
+

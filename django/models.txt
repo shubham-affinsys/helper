@@ -1,0 +1,173 @@
+create models in models.py
+
+from django.db import models
+
+class Car(models.Model):
+    car_name = models.CharField(max_length=200)
+    speed = models.IntegerField(default=100)
+
+    def __str__(self) -> str:
+        return self.car_name +" "+str(self.speed)
+
+
+CREATE
+
+create car obj:
+1. car = Car(car_name="Nexon",speed=110) # need to save using car.save()
+2. car = Car.objects.create(car_name="Nexon",speed=110)  # auto save
+3. car_obj = {'car_name':'alto','speed':120}
+    car = Car.objects.create(**car_obj)
+
+
+UPDATE
+
+>>> Car.objects.filter(id=1).update(car_name="new_car")
+>>>1
+
+
+
+DELETE
+>>>Car.objects.all().delete()
+>>>(3,{'home.Car':3})
+
+>>>Car.objects.filter(id=1).delete()
+>>>(1,{home.Car':1})
+
+
+READ:
+>>> cars = Car.objects.all()
+>>> cars
+<QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
+
+
+>>>car = Car.objects.get('car_name'='Nexon')
+>>>car
+>>>Nexon 120
+
+
+
+READ lookups:
+
+get query in a specific sort order --> descending order
+queryset = Recipe.objects.all().order_by('-recipe_view_count')
+
+fetch limited results --> fetch most viewed 10 results
+queryset = Recipe.objects.all().order_by('-recipe_view_count')[0:10]
+
+fetch only recipes with view count more than or less 50
+ queryset = Recipe.objects.filter(recipe_view_count=50) # less than 50
+ queryset = Recipe.objects.filter(recipe_view_count__gte=50) # greater than than 50
+
+
+
+
+BASIC
+__gt : greater than
+__gte : greater than equal to
+__lte : less than equal to
+__exact : exact match
+__iexact : case insensitive exact match
+__contains : check for substring
+__icontains : case insensitive substring match
+__in=[val1,val2,val3] : if value is in given list
+__startswith : check if the value starts with a string
+__istartswith
+__endswith
+__iendswith
+
+
+DATE LOOKUPS
+__date = date.time(2024,8,20)
+__year=2024
+__month=8
+__day=8
+__week
+__week_day=1  # monday
+__quarter=3
+__time = date.time(14,30)
+__hour=14
+__minute=30
+__second=0
+
+BOOLEAN and NULL
+__regex = r"^[A-Za-z0-9]+$"
+__iregex
+__range = (start_val,end_val)
+
+F expresion lookup :n compare one field to other
+filed__gte = F('other_field)
+
+
+JSON filed lookup
+__has_key = 'key_name'
+__has_keys = ['key1','key2']
+__has_any_keys = ['key1','key2']
+
+
+
+
+
+
+vege.views.py
+from django.shortcuts import render, redirect
+from .models import Recipe
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url="/login/")
+def recipes(request):
+
+    if request.method == "POST":
+        data = request.POST
+        recipe_image = request.FILES.get('recipe_image')
+        recipe_name = data.get('recipe_name')
+        recipe_description = data.get('recipe_description')
+
+        recipe = Recipe.objects.create(
+            recipe_image=recipe_image,
+            recipe_name=recipe_name,
+            recipe_description=recipe_description
+        )
+        print("recipe stored successfully =====>", recipe.id)
+        return redirect("/vege/recipes/")
+
+    queryset = Recipe.objects.all().order_by('-recipe_view_count') # - for sorting in desc
+
+    if request.GET.get('search'):
+        queryset = queryset.filter(recipe_name__icontains=request.GET.get('search'))
+
+    context = {'recipes': queryset}
+    return render(request, 'recipes.html', context=context)
+
+
+def delete_recipe(request, id):
+    queryset = Recipe.objects.get(id=id)
+    queryset.delete()
+    print("recipe deleted ===>", id)
+    return redirect('/vege/recipes/')
+
+
+def update_recipe(request, id):
+    queryset = Recipe.objects.get(id=id)
+    if request.method == "POST":
+        data = request.POST
+        recipe_image = request.FILES.get('recipe_image')
+        queryset.recipe_name = data.get('recipe_name')
+        queryset.recipe_description = data.get('recipe_description')
+
+        if recipe_image:
+            queryset.recipe_image = recipe_image
+
+        # Recipe.objects.filter(id=id).update(
+        #     recipe_image=recipe_image,
+        #     recipe_name=recipe_name,
+        #     recipe_description=recipe_description
+        # )
+
+        queryset.save()
+        print("recipe updated successfully =====>", id)
+        return redirect("vege/recipes/")
+    context = {'recipe': queryset}
+    return render(request, 'update_recipe.html', context)

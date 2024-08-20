@@ -1,0 +1,55 @@
+settings.py
+
+
+#######
+adding external apps:
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+
+EXTERNAL_APPS = [
+    'home',
+    'accounts',
+    'vege'
+]
+
+INSTALLED_APPS += EXTERNAL_APPS
+
+#######
+connecting Database:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dj',
+        'USER': 'shubham',
+        'PASSWORD': '9504',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
+    }
+}
+
+
+#########
+make files dynamic to store in CDN or locally
+
+#files wil be stored in public/static/ file_s
+import os
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIR = {
+    os.path.join(BASE_DIR, 'public/static')
+}
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'public/static')
+MEDIA_URL = '/media/'
+
+#also add following urlpattern to urls.py of main_dir myfj in this case
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += staticfiles_urlpatterns()

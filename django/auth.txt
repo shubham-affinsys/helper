@@ -1,0 +1,67 @@
+Django provides prebuild models with some attributes 
+ex User
+
+from django.shortcuts import render, redirect
+from .models import Recipe
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.decorators import login_required
+
+
+REGISTER :
+
+def register_page(request):
+    if request.method == 'POST':
+        data = request.POST
+        first_name = data.get("first_name")
+        last_name = data.get('last_name')
+
+        username = data.get('username')
+        password = data.get('password')
+
+        # check if the username already exists
+        user = User.objects.filter(username=username)
+        if user.exists():
+            print('user already exists')
+            messages.error(request, 'Username already taken')
+            return redirect('/register/')
+
+        user = User.objects.create(first_name=first_name, last_name=last_name, username=username)
+        user.set_password(password)
+        user.save()
+        messages.success(request, 'Account created successfully')
+        return redirect('/register/')
+
+    return render(request, 'register.html')
+
+
+LOGIN:
+
+def login_page(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not User.objects.filter(username=username).exists():
+            messages.error(request, 'user not found')
+            return redirect('/login/')
+
+        user = authenticate(request,username=username, password=password)
+        if user is None or user == '':
+            messages.error(request, 'Invalid password')
+            return redirect('/login/')
+        else:
+            login(request,user)  # this method of django maintains session of user login
+            print(user, "logged in")
+            return redirect('/vege/recipes/')
+
+    return render(request, 'login.html')
+
+
+LOGOUT:
+
+def logout_page(request):
+    logout(request)
+    print("user logged out")
+    return redirect('/login/')

@@ -1,0 +1,52 @@
+https://www.rabbitmq.com/tutorials/tutorial-four-python
+
+# stop the local node
+sudo systemctl stop rabbitmq-server
+
+# start it back
+sudo systemctl start rabbitmq-server
+
+# check on service status as observed by service manager
+sudo systemctl status rabbitmq-server
+
+
+# checks if the local node is running and CLI tools can successfully authenticate with it
+sudo rabbitmq-diagnostics ping
+
+# prints enabled components (applications), TCP listeners, memory usage breakdown, alarms
+# and so on
+sudo rabbitmq-diagnostics status
+
+# prints cluster membership information
+sudo rabbitmq-diagnostics cluster_status
+
+# prints effective node configuration
+sudo rabbitmq-diagnostics environment
+
+#list all queues
+sudo rabbitmqctl list_queues
+
+# manual msg ack
+
+# debug basic_ack:
+# sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged
+
+REDIS PUBSUB VS RABBITMQ -->
+Redis works better in enterprise applications that require real-time data processing and
+low-latency caching. With its in-memory data store and support for diverse data structures,
+Redis is suitable for performing low-level data computation. For example,
+financial institutions use Redis to cache transactional data to enable real-time fraud detection.
+
+Meanwhile, choose RabbitMQ if you need a dedicated microservices message broker with
+asynchronous communication mechanisms to support code and system building.
+RabbitMQ is also more suitable than Redis for transferring large files between applications.
+For example, a system that needs to send data reliably between many microservices might choose RabbitMQ.
+The system will benefit from RabbitMQ’s fault tolerance, larger file handling capacity,
+and guaranteed message delivery mechanisms.
+
+PUBSUB
+once the consumer connection is closed, the queue should be deleted. There's an exclusive flag for that:
+result = channel.queue_declare(queue='', exclusive=True)
+
+
+

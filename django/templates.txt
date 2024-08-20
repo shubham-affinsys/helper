@@ -1,0 +1,152 @@
+we need a base.html and add the static code to it\
+create blocks that are dynamic and changes acc to other FILES
+
+ex.
+<!doctype html>
+<html lang="en">
+  <head>
+    <title> {{title}} </title>
+  </head>
+  <style>
+
+  ###########
+    {% block style %}
+    {% endblock %}
+
+  </style>
+
+<body>
+<nav>
+          <form class="d-flex" role="search">
+            {% if request.user.is_authenticated %}
+            <a href="/logout/" class="btn btn-outline-danger" type="submit">Logout</a>
+            {% else %}
+            <a href="/login/" class="btn btn-outline-success" type="submit">Login</a>
+</nav>
+
+  {% block content %}
+  {% endblock %}
+
+  </body>
+</html>
+
+
+make other html templates
+ex home.html
+
+{% extends "base.html" %}
+
+{% block style %}
+
+    table,th,td {
+    border:2px solid black;
+    border-color: blue;
+    border-collapse:collapse;
+    padding:5px;
+    }
+
+{% endblock %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<div>
+    <br>
+  <p>user: {{user}}</p>
+    <p>data: {{ data }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label>
+            <input type="text" name="username_input" required>
+            <br>
+            <br>
+            <input type="text" name="user_data">
+        </label>
+        <button type="submit">Submit</button>
+    </form>
+    <br>
+    <br>
+    <table>
+        <tr>
+            <th>S.No</th>
+            <th>USER</th>
+            <th>DATA</th>
+            <th>Data entered</th>
+        </tr>
+
+        {% for user,data in all_user_data.items %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{user}}</td>
+            <td>{{data}}</td>
+            <td {% if data == "No data was entered for the user" %} style="background-color:red;" {% endif %}>
+                {% if data == "No data was entered for the user" %}
+                NO
+                {% else %}
+                Yes
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+##################
+Render templates from views
+return render(request, "home.html", {'data': data, 'user': user, 'all_user_data': all_user_data})
+
+def users(request):
+    return render(request, "index.html")
+
+
+def about(request):
+
+    st_obj = Student.objects.get()
+
+
+    context = {'title': 'About'}
+    return render(request, "about.html", context)
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from .my_utils import my_cache
+import json
+from .models import Student
+
+# Create your views here.
+def home(request, usr="guest"):
+    user = usr
+    data = "Guest has no data"
+    if my_cache.exists(user):
+        data = my_cache.fetch(user).decode('utf-8')
+
+    all_user_data = my_cache.get_all()
+
+    if request.method == 'POST':
+        user = request.POST.get('username_input')
+        data = request.POST.get('user_data')
+        if user:
+            if my_cache.exists(user):
+                data = my_cache.fetch(user).decode('utf-8')
+            else:
+                if data is None or data == "":
+                    data = "No data was entered for the user"
+                my_cache.insert(user, data)
+        else:
+            user = "guest"
+            data = "Guest has no data"
+
+    # return HttpResponse(json.dumps(data))
+    return render(request, "home.html", {'data': data, 'user': user, 'all_user_data': all_user_data})
