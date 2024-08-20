@@ -76,15 +76,15 @@ it will give departmnet name
 'STU-0001'
 
 
-queryset = Student.objects.get(student_name="shubh")
+queryset = Student.objects.get(student_name="shubh") # will raise an exception if the data does notexists
 queryset = Student.objects.filter(student_age__gte=20)
 queryset = Student.objects.exclude(student_name__icontains="s")
 queryset = Student.objects.order_by("-student_age)  # -ve for desc
- queryset = Student.objects.order_by('student_id').distinct('student_id')
+queryset = Student.objects.order_by('student_id').distinct('student_id')
+queryset = Student.object.value_list('id','student')   # fetch only specific feilds
 
 queryset.count() # give size of results
 queryset.values()  # makes the reuslt as dict
-
 
 
 
