@@ -21,6 +21,11 @@ class Department(models.Model):
 
 
 
+MIGRATION
+when we make changes in models we need to make migrations only then changes will take effect
+1. python3 manage.py makemigrations
+2. python3 manage.py migrate 
+
 
 CREATE
 
