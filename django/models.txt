@@ -86,7 +86,20 @@ queryset = Student.object.value_list('id','student')   # fetch only specific fei
 queryset.count() # give size of results
 queryset.values()  # makes the reuslt as dict
 
+# AGGREGATE fn work on single column ex student_age
+queryset = Student.objects.aggregate(Avg('student_age'))
+queryset = Student.objects.aggregate(Max('student_age'))  # Min
+queryset = Student.objects.aggregate(Sum('student_age'))
 
+#ANNOTATE works on multiple cloumns ex count of students that have same age and all ages
+queryset = Student.objects.values('student_age').annotate(Count('student_age'))
+
+# count of student in each department
+queryset = Student.objects.values('department').annotate(Count('department'))
+
+multi annotate
+queryset = Student.objects.annotate(Count('department'),Count('student_age')) # objects
+queryset = Student.objects.values('department','student_age').annotate(Count('department'),Count('student_age')) # values dict
 
 
 READ lookups:
