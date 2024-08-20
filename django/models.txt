@@ -61,6 +61,19 @@ READ:
 >>>car
 >>>Nexon 120
 
+if attribute is an object ex student has attirubute department that is foregn key or studnet_id
+
+>>>Student.objects.get(student_name'"shubh").department
+will give department object while
+
+>>>Student.objects.get(student_name'"shubh").department.department
+it will give departmnet name
+
+>>> s = Student.objects.get(student_name="shubh")
+>>> s.student_id
+<StudentID: STU-0001>
+>>> s.student_id.student_id
+'STU-0001'
 
 
 READ lookups:
@@ -76,7 +89,10 @@ fetch only recipes with view count more than or less 50
  queryset = Recipe.objects.filter(recipe_view_count__gte=50) # greater than than 50
 
 
+custom :
 
+feild__custom_para = "val"
+ex Student.objects.filter(department__department=="CIVIL")
 
 BASIC
 __gt : greater than
