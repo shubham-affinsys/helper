@@ -76,6 +76,19 @@ it will give departmnet name
 'STU-0001'
 
 
+queryset = Student.objects.get(student_name="shubh")
+queryset = Student.objects.filter(student_age__gte=20)
+queryset = Student.objects.exclude(student_name__icontains="s")
+queryset = Student.objects.order_by("-student_age)  # -ve for desc
+ queryset = Student.objects.order_by('student_id').distinct('student_id')
+
+queryset.count() # give size of results
+queryset.values()  # makes the reuslt as dict
+
+
+
+
+
 READ lookups:
 
 get query in a specific sort order --> descending order
