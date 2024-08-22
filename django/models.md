@@ -43,14 +43,12 @@ when we make changes in models we need to make migrations only then changes will
 ### CREATE
  
 create car obj:
-
->car = Car(car_name="Nexon",speed=110) # need to save using car.save()
-
->car = Car.objects.create(car_name="Nexon",speed=110)  # auto save
-
->car_obj = {'car_name':'alto','speed':120}
+1. ```car = Car(car_name="Nexon",speed=110) # need to save using car.save()```
+2. ```python car = Car.objects.create(car_name="Nexon",speed=110)  # auto save```
+3. ```python
+    car_obj = {'car_name':'alto','speed':120}
     car = Car.objects.create(**car_obj)
-
+   ```
 
 ### UPDATE
 
@@ -67,26 +65,34 @@ Car.objects.filter(id=1).update(car_name="new_car")
 ### READ:
 > cars = Car.objects.all()
 
-<QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
+>> <QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
 
 
->>>car = Car.objects.get('car_name'='Nexon')
->>>car
->>>Nexon 120
+>car = Car.objects.get('car_name'='Nexon')
 
-if attribute is an object ex student has attirubute department that is foregn key or studnet_id
+>car
 
->>>Student.objects.get(student_name'"shubh").department
-will give department object while
+>>Nexon 120
 
->>>Student.objects.get(student_name'"shubh").department.department
-it will give departmnet name
+#### if attribute is an object ex student has attirubute department that is foregn key or studnet_id
 
->>> s = Student.objects.get(student_name="shubh")
->>> s.student_id
-<StudentID: STU-0001>
->>> s.student_id.student_id
-'STU-0001'
+>Student.objects.get(student_name'"shubh").department
+
+it  will give department object while
+
+>Student.objects.get(student_name'"shubh").department.department
+
+ It will give departmnet name
+
+>s = Student.objects.get(student_name="shubh")
+
+> s.student_id
+ 
+>><StudentID: STU-0001>
+
+> s.student_id.student_id
+
+>>'STU-0001'
 
 
 queryset = Student.objects.get(student_name="shubh") # will raise an exception if the data does notexists
