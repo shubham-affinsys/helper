@@ -1,7 +1,6 @@
-create models in models.py
-
+### How to create models in models.py
+```
 from django.db import models
-
 class Car(models.Model):
     car_name = models.CharField(max_length=200)
     speed = models.IntegerField(default=100)
@@ -18,42 +17,56 @@ class Department(models.Model):
 
     class Meta:
         ordering = ['department'] # data will be stored in a specific order department name in this case
+```
 
+### Creating a base model
 
+#### default django models does not have uuid
 
-MIGRATION
-when we make changes in models we need to make migrations only then changes will take effect
-1. python3 manage.py makemigrations
-2. python3 manage.py migrate 
+```
+class BaseModel(models.Model):
+    uid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
+    created_at = models.DateField(auto_now=True)
+    updated_at = models.DateField(auto_now_add=True) 
 
+    class Meta:
+        abstract = True  # so that we can use it as a class
+```
 
-CREATE
+### MIGRATION
 
+when we make changes in models we need to make migrations only then changes will take effect 
+>python3 manage.py makemigrations
+ 
+>python3 manage.py migrate 
+
+### CREATE
+ 
 create car obj:
-1. car = Car(car_name="Nexon",speed=110) # need to save using car.save()
-2. car = Car.objects.create(car_name="Nexon",speed=110)  # auto save
-3. car_obj = {'car_name':'alto','speed':120}
+
+>car = Car(car_name="Nexon",speed=110) # need to save using car.save()
+
+>car = Car.objects.create(car_name="Nexon",speed=110)  # auto save
+
+>car_obj = {'car_name':'alto','speed':120}
     car = Car.objects.create(**car_obj)
 
 
-UPDATE
+### UPDATE
 
->>> Car.objects.filter(id=1).update(car_name="new_car")
->>>1
+Car.objects.filter(id=1).update(car_name="new_car")
+1
 
+### DELETE
 
+>Car.objects.all().delete()
 
-DELETE
->>>Car.objects.all().delete()
->>>(3,{'home.Car':3})
-
->>>Car.objects.filter(id=1).delete()
->>>(1,{home.Car':1})
+>Car.objects.filter(id=1).delete()
 
 
-READ:
->>> cars = Car.objects.all()
->>> cars
+### READ:
+> cars = Car.objects.all()
+
 <QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
 
 
