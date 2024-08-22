@@ -1,5 +1,5 @@
 ### How to create models in models.py
-```
+```python
 from django.db import models
 class Car(models.Model):
     car_name = models.CharField(max_length=200)
@@ -8,7 +8,7 @@ class Car(models.Model):
     def __str__(self) -> str:
         return self.car_name +" "+str(self.speed)
 
-store data in an order -->
+#store data in an order -->
 class Department(models.Model):
     department = models.CharField(max_length=100)
 
@@ -19,82 +19,77 @@ class Department(models.Model):
         ordering = ['department'] # data will be stored in a specific order department name in this case
 ```
 
-### Creating a base model
-
-#### default django models does not have uuid
-
-```
-class BaseModel(models.Model):
-    uid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
-    created_at = models.DateField(auto_now=True)
-    updated_at = models.DateField(auto_now_add=True) 
-
-    class Meta:
-        abstract = True  # so that we can use it as a class
-```
-
 ### MIGRATION
 
-when we make changes in models we need to make migrations only then changes will take effect 
->python3 manage.py makemigrations
- 
->python3 manage.py migrate 
+when we make changes in models we need to make migrations only then changes will take effect
+
+1. ```python3 manage.py makemigrations```
+2. ```python3 manage.py migrate``` 
 
 ### CREATE
  
-create car obj:
-1. ```car = Car(car_name="Nexon",speed=110) # need to save using car.save()```
-2. ```python car = Car.objects.create(car_name="Nexon",speed=110)  # auto save```
+create car obj
+1. ```python
+    car = Car(car_name="Nexon",speed=110) # need to save using car.save()
+    ```
+   
+2. ```python
+    car = Car.objects.create(car_name="Nexon",speed=110)  # auto save
+    ```
 3. ```python
     car_obj = {'car_name':'alto','speed':120}
     car = Car.objects.create(**car_obj)
    ```
 
 ### UPDATE
-
+update a created object 
+```python
 Car.objects.filter(id=1).update(car_name="new_car")
-1
+```
+>1
 
 ### DELETE
-
->Car.objects.all().delete()
-
->Car.objects.filter(id=1).delete()
+```python
+Car.objects.all().delete()
+Car.objects.filter(id=1).delete()
+```
 
 
 ### READ:
-> cars = Car.objects.all()
+```python
+cars = Car.objects.all()
+```
+><QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
 
->> <QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
-
-
->car = Car.objects.get('car_name'='Nexon')
-
+```python
+car = Car.objects.get('car_name'='Nexon')
+```
 >car
-
 >>Nexon 120
 
-#### if attribute is an object ex student has attirubute department that is foregn key or studnet_id
+if attribute is an object ex student has attirubute department that is foregn key or studnet_id
 
->Student.objects.get(student_name'"shubh").department
+```python
+Student.objects.get(student_name'"shubh").department
+```
 
 it  will give department object while
+```python
+Student.objects.get(student_name'"shubh").department.department
+```
 
->Student.objects.get(student_name'"shubh").department.department
-
- It will give departmnet name
-
->s = Student.objects.get(student_name="shubh")
+It will give departmnet name
+```python
+s = Student.objects.get(student_name="shubh")
+```
 
 > s.student_id
- 
 >><StudentID: STU-0001>
 
 > s.student_id.student_id
-
 >>'STU-0001'
 
-
+```python
 queryset = Student.objects.get(student_name="shubh") # will raise an exception if the data does notexists
 queryset = Student.objects.filter(student_age__gte=20)
 queryset = Student.objects.exclude(student_name__icontains="s")
@@ -104,46 +99,54 @@ queryset = Student.object.value_list('id','student')   # fetch only specific fei
 
 queryset.count() # give size of results
 queryset.values()  # makes the reuslt as dict
+```
 
-# AGGREGATE fn work on single column ex student_age
+### AGGREGATE
+function work on single column ex student_age
+```python
 queryset = Student.objects.aggregate(Avg('student_age'))
-queryset = Student.objects.aggregate(Max('student_age'))  # Min
+queryset = Student.objects.aggregate(Max('student_age'))
+queryset = Student.objects.aggregate(Min('student_age'))
 queryset = Student.objects.aggregate(Sum('student_age'))
+```
 
-#ANNOTATE works on multiple cloumns ex count of students that have same age and all ages
+### ANNOTATE
+works on multiple cloumns ex count of students that have same age and all ages
+```python
+# count of student in each student age group
 queryset = Student.objects.values('student_age').annotate(Count('student_age'))
-
-# count of student in each department
 queryset = Student.objects.values('department').annotate(Count('department'))
 
-multi annotate
+#multi annotate
 queryset = Student.objects.annotate(Count('department'),Count('student_age')) # objects
 queryset = Student.objects.values('department','student_age').annotate(Count('department'),Count('student_age')) # values dict
+```
 
-
-READ lookups:
-
-get query in a specific sort order --> descending order
+### LOOKUPS
+```python
+#get query in a specific sort order --> descending order
 queryset = Recipe.objects.all().order_by('-recipe_view_count')
 
-fetch limited results --> fetch most viewed 10 results
+#fetch limited results --> fetch most viewed 10 results
 queryset = Recipe.objects.all().order_by('-recipe_view_count')[0:10]
 
-fetch only recipes with view count more than or less 50
- queryset = Recipe.objects.filter(recipe_view_count=50) # less than 50
- queryset = Recipe.objects.filter(recipe_view_count__gte=50) # greater than than 50
+#fetch only recipes with view count more than or less 50
+queryset = Recipe.objects.filter(recipe_view_count=50) # less than 50
+queryset = Recipe.objects.filter(recipe_view_count__gte=50) # greater than than 50
+```
 
-
-custom :
-
+#### custom lookups based on fields/attribute of model :
+```python
 feild__custom_para = "val"
-ex Student.objects.filter(department__department=="CIVIL")
+# ex
+Student.objects.filter(department__department=="CIVIL")
 
-can also merge multiple in one statement
-Student.objects.filter(department__department__icontains=="C")  # will inculde CICIl and CSE department
+#can also merge multiple in one statement
+Student.objects.filter(department__department__icontains=="C")  # will include CIVIl and CSE department
+```
 
-
-BASIC
+### READ lookup
+```
 __gt : greater than
 __gte : greater than equal to
 __lte : less than equal to
@@ -156,9 +159,10 @@ __startswith : check if the value starts with a string
 __istartswith
 __endswith
 __iendswith
+```
 
-
-DATE LOOKUPS
+### DATE LOOKUPS
+```
 __date = date.time(2024,8,20)
 __year=2024
 __month=8
@@ -170,33 +174,38 @@ __time = date.time(14,30)
 __hour=14
 __minute=30
 __second=0
+```
 
-BOOLEAN and NULL
+### BOOLEAN and NULL
+```
 __regex = r"^[A-Za-z0-9]+$"
 __iregex
 __range = (start_val,end_val)
-
-F expresion lookup :n compare one field to other
+```
+### F expresion lookup
+compare one field to other
+```
 filed__gte = F('other_field)
+```
 
-
-JSON filed lookup
+### JSON filed lookup
+```
 __has_key = 'key_name'
 __has_keys = ['key1','key2']
 __has_any_keys = ['key1','key2']
+```
 
+### ADD FAKE DATA USING FAKER
+```pip install faker```
 
-ADD FAKE DATA USING FAKER
-pip install faker
+create ```file seed.py```
 
-create file seed.py
-
+```python
 from faker import Faker
 import random
 from .models import *
 
 fake = Faker()
-
 
 def seed_db(n=10) -> None:
     try:
@@ -222,10 +231,11 @@ def seed_db(n=10) -> None:
             )
     except Exception as e:
         print(e)
+```
 
+Add following code  in file ```views.py``` in vege
+```python
 
-
-vege.views.py
 from django.shortcuts import render, redirect
 from .models import Recipe
 from django.contrib.auth.models import User
@@ -288,3 +298,20 @@ def update_recipe(request, id):
         return redirect("vege/recipes/")
     context = {'recipe': queryset}
     return render(request, 'update_recipe.html', context)
+```
+
+
+
+### Creating a base model
+
+#### default django models does not have uuid
+
+```python
+class BaseModel(models.Model):
+    uid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
+    created_at = models.DateField(auto_now=True)
+    updated_at = models.DateField(auto_now_add=True) 
+
+    class Meta:
+        abstract = True  # so that we can use it as a class
+```
