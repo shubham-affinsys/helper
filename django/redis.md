@@ -456,8 +456,48 @@ RESET
 QUIT
 ```
 
+In Pub Sub there are publisher (redis_pub.py) and Subscriber (redis_sub.py):
+```redis_pub.py```
+```python
+import redis
+import sys
 
+if len(sys.argv) == 2:
+    program, action = sys.argv
+    channel = "shubh"
+    client = redis.Redis(host='localhost', port=6379)
+    client.publish(channel, action)
+else:
+    print("You must give action(what you want to publish)")
+```
+run in console with arguments: 
+```
+$ python3 redis_pub.py "my message"
+```
 
+```redis_sub.py```
+```python
+import redis
+import sys
+
+channel = "shubh"
+
+client = redis.Redis(host="localhost", port=6379)
+c = client.pubsub()
+c.subscribe("shubh")
+
+print("Subscribed to channel:", channel)
+while True:
+    try:
+        msg = c.get_message()
+        if msg and msg['data'] != 1:
+            msg = msg["data"].decode('utf-8')
+            print(msg)
+
+    except KeyboardInterrupt:
+        print("Intruded")
+        sys.exit(0)
+```
 
 
 
