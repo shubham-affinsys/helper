@@ -42,13 +42,19 @@ create car obj
    ```
 
 ### UPDATE
+
 update a created object 
+
 ```python
-Car.objects.filter(id=1).update(car_name="new_car")
+
+    Car.objects.filter(id=1).update(car_name="new_car")
+
 ```
+
 >1
 
 ### DELETE
+
 ```python
 Car.objects.all().delete()
 Car.objects.filter(id=1).delete()
@@ -59,7 +65,8 @@ Car.objects.filter(id=1).delete()
 ```python
 cars = Car.objects.all()
 ```
-><QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
+
+<QuerySet [<Car: Car object (1)>, <Car: Car object (2)>, <Car: Car object (3)>, <Car: Car object (4)>]>
 
 ```python
 car = Car.objects.get('car_name'='Nexon')
@@ -304,8 +311,8 @@ def update_recipe(request, id):
 
 ### Creating a base model
 
-#### default django models does not have uuid
-
+#### default django models does not have uuid 
+```models.py```
 ```python
 class BaseModel(models.Model):
     uid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4())
@@ -314,4 +321,64 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True  # so that we can use it as a class
+```
+
+
+### ORM in Django 
+#### creating relation bw models
+```models.py```
+```python
+
+class StudentID(models.Model):
+    student_id = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.student_id
+
+class Student(models.Model):
+    department = models.ForeignKey(Department, related_name='depart', on_delete=models.CASCADE)
+    student_id = models.OneToOneField(StudentID, related_name='studentid', on_delete=models.CASCADE)
+    student_name = models.CharField(max_length=100)
+    student_email = models.EmailField(unique=True)
+    student_age = models.IntegerField(default=18)
+    student_address = models.TextField()
+
+    def __str__(self):
+        return self.student_name
+
+    class Meta:
+        ordering = ['student_name']
+        verbose_name = "student"
+
+
+class Subject(models.Model):
+    subject_name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.subject_name
+
+class SubjectMarks(models.Model):
+    student = models.ForeignKey(Student, related_name='studentmarks', on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    marks = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.student.student_name} {self.subject.subject_name}'
+
+    class Meta:
+        unique_together = ['student', #
+                           'subject']  # every marks for subject will be unique and new subject of same name will not be created
+
+
+```
+
+
+### Serializing model data
+ this model todo present in ```models.py``` will be serialized in ```serializer.py```
+```pyhton
+class Todo(BaseModel):
+    todo_title = models.CharField(max_length=100)
+    todo_description = models.TextField()
+    is_done = models.BooleanField(default=False) 
+
 ```
