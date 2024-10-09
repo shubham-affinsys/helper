@@ -67,6 +67,6 @@ def close_page(bbc_cookie=None,bbp_cookie=None,bbetb_cookie=None):
 
 
 #test links
-# https://beta1.studio.bankbuddy.me/bot/callback/insurebuddyone/submit/?channel_id={channel_id}&channel_code={channel_code}&tenant={tenant}&utter_show_payment_success={utter_show_payment_success}
-# https://beta1.studio.bankbuddy.me/payments/?tenant=insurebuddyone&channel_code=webchat&utter_show_payment_success=utter_show_payment_success&channel_id=8b2cacacda59d6d3ab7a35289440f7a2&delayOff=true
+# https://beta1.studio.bankbuddy.me/bot/callback/insurebuddyone/submit/?channel_id={channel_id}&channel_code={channel_code}&tenant={tenant}&utter_show_payment_success=utter_show_payment_success
+
 ```
