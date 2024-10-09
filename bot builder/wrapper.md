@@ -9,7 +9,7 @@ class Wrapper(wrappers.BaseWrapper):
   async def __call__(self, *args, **kwargs):
     logger.debug("Entering wrapper....accounts")
 
-    # call and api and store the response
+    # fetch all acoounts and store it in a account list of dictionaries
     response = self.call_api(api_name="API_EXT_GET_ACCOUNTS")
     data = response.json()
     
